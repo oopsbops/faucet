@@ -1,0 +1,16 @@
+version: "3"
+services:
+  faucet:
+    build:
+      context: .
+    container_name: faucet-local
+    image: faucet-local
+    ports:
+      - 8000:8000 # rest
+    environment:
+      - FAUCET_MNEMONIC=cute lucky garden level material elite clip rice segment medal library rate silver wolf midnight whale danger dress erosion couch fit reason luxury trash
+      - FAUCET_TOKENS=ugio,uusd
+      - FAUCET_ADDRESS_PREFIX=gio
+      - FAUCET_GAS_PRICE=0.000001ugio
+        # entrypoint: ['sleep', '3600']
+    entrypoint: ['sh', '-c', 'node /app/faucet/bin/faucet-start start http://localhost:26657']

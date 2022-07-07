@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GotaBit Faucet</title>
+  <style>
+    body {
+      align-items: center;
+      background-color: #000;
+      display: flex;
+      justify-content: center;
+      height: 90vh;
+    }
+
+    .form {
+      background-color: #15172b;
+      border-radius: 20px;
+      box-sizing: border-box;
+      height: 400px;
+      padding: 20px;
+      width: 420px;
+    }
+
+    .title {
+      color: #eee;
+      font-family: sans-serif;
+      font-size: 36px;
+      font-weight: 600;
+      margin-top: 20px;
+    }
+
+    .input-container {
+      height: 50px;
+      position: relative;
+      width: 100%;
+    }
+
+    .ic1 {
+      margin-top: 40px;
+    }
+
+    .ic2 {
+      margin-top: 30px;
+    }
+
+    .input {
+      background-color: #303245;
+      border-radius: 12px;
+      border: 0;
+      box-sizing: border-box;
+      color: #eee;
+      font-size: 15px;
+      height: 100%;
+      outline: 0;
+      padding: 4px 20px 0;
+      width: 100%;
+    }
+
+    .cut {
+      background-color: #15172b;
+      border-radius: 10px;
+      height: 20px;
+      left: 20px;
+      position: absolute;
+      top: -20px;
+      transform: translateY(0);
+      transition: transform 200ms;
+      width: 76px;
+    }
+
+    .cut-short {
+      width: 50px;
+    }
+
+    .input:focus~.cut,
+    .input:not(:placeholder-shown)~.cut {
+      transform: translateY(8px);
+    }
+
+    .placeholder {
+      color: #65657b;
+      font-family: sans-serif;
+      left: 20px;
+      line-height: 14px;
+      pointer-events: none;
+      position: absolute;
+      transform-origin: 0 50%;
+      transition: transform 200ms, color 200ms;
+      top: 20px;
+    }
+
+    .input:focus~.placeholder,
+    .input:not(:placeholder-shown)~.placeholder {
+      transform: translateY(-30px) translateX(10px) scale(0.75);
+    }
+
+    .input:not(:placeholder-shown)~.placeholder {
+      color: #808097;
+    }
+
+    .input:focus~.placeholder {
+      color: #dc2f55;
+    }
+
+    .submit {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #08d;
+      border-radius: 12px;
+      border: 0;
+      box-sizing: border-box;
+      color: #eee;
+      cursor: pointer;
+      font-size: 18px;
+      height: 50px;
+      margin-top: 38px;
+      text-align: center;
+      width: 100%;
+    }
+
+    .submit:active {
+      background-color: #06b;
+    }
+
+    .submit:disabled {
+      background-color: #828a90;
+    }
+
+    @keyframes lds-dual-ring {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    .submit:disabled::after {
+      content: '';
+      width: 10px;
+      height: 10px;
+      margin-left: 10px;
+      border-radius: 100%;
+      border: 2px solid #fff;
+      border-color: #fff transparent #fff transparent;
+      animation: lds-dual-ring 1s linear infinite;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="form">
+    <div class="title">GotaBit Faucet</div>
+    <div class="input-container ic1">
+      <input id="denom" name="denom" spellcheck="false"  class="input" type="text" placeholder=" " />
+      <div class="cut"></div>
+      <label for="firstname" class="placeholder">Denom</label>
+    </div>
+    <div class="input-container ic2">
+      <input id="address" name="address" spellcheck="false"  class="input" type="text" placeholder=" " />
+      <div class="cut"></div>
+      <label for="lastname" class="placeholder">Address</label>
+    </div>
+    <button type="text" id="submit" class="submit">submit</button>
+  </div>
+
+  <script>
+    async function postData(url = '', data = {}) {
+      // Default options are marked with *
+      const response = await fetch(url, {
+        method: 'POST', // *GET, POST, PUT, DELETE, etc.
+        mode: 'cors', // no-cors, *cors, same-origin
+        cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+        credentials: 'same-origin', // include, *same-origin, omit
+        headers: {
+          'Content-Type': 'application/json'
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        redirect: 'follow', // manual, *follow, error
+        referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+        body: JSON.stringify(data) // body data type must match "Content-Type" header
+      }).then(res => res.json());
+
+      return response; // parses JSON response into native JavaScript objects
+    }
+
+    const button = document.querySelector('#submit')
+    function submit() {
+      const denom = document.querySelector('#denom').value.toString()
+      const address = document.querySelector('#address').value.toString()
+      if (denom && address) {
+        button.setAttribute('disabled', false)
+        postData('/credit', { denom, address })
+          .then(data => {
+            if (data.code === 200) {
+              alert(data.message)
+            } else {
+              alert("Error: " + data.message)
+            }
+          }).catch((e) => {
+            console.log(e)
+            alert(e.toString())
+          }).finally(() => {
+            button.removeAttribute('disabled')
+          })
+      }
+    }
+    button.addEventListener('click', submit)
+  </script>
+</body>
+</html>
